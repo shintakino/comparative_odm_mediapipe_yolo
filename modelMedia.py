@@ -80,7 +80,7 @@ def draw_detections_and_landmarks(image, object_result, hand_result, frame_count
 # Initialize both detectors
 def initialize_detectors():
     # Object detector setup
-    object_base_options = python.BaseOptions(model_asset_path='media.tflite')
+    object_base_options = python.BaseOptions(model_asset_path='mediaNew.tflite')
     object_options = vision.ObjectDetectorOptions(
         base_options=object_base_options,
         score_threshold=0.5)

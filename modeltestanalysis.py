@@ -75,7 +75,7 @@ def visualize_mediapipe(image, object_result, hand_result, frame_count, fps):
 # Initialize MediaPipe detectors
 def initialize_mediapipe_detectors():
     # Object detector setup
-    object_base_options = python.BaseOptions(model_asset_path='media.tflite')
+    object_base_options = python.BaseOptions(model_asset_path='mediaNew.tflite')
     object_options = vision.ObjectDetectorOptions(
         base_options=object_base_options,
         score_threshold=0.5)
@@ -91,7 +91,7 @@ def initialize_mediapipe_detectors():
     return object_detector, hand_detector
 
 # Load YOLO Model
-yolo_model = YOLO("yolo.pt")
+yolo_model = YOLO("yoloNew.pt")
 
 # Load Video Input
 video_file = 'analysis.mp4'

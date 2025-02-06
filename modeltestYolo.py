@@ -4,7 +4,7 @@ from ultralytics import YOLO
 import matplotlib.pyplot as plt
 
 # Load the YOLO model
-model = YOLO("yolo.pt")
+model = YOLO("yoloNew.pt")
 
 # Setup constants for visualization
 MARGIN = 25  # pixels

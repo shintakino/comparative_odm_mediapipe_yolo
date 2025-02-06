@@ -7,18 +7,18 @@ from mediapipe.tasks.python import vision
 import os
 
 # Step 1: Load JSON data from a file
-json_path = r'datasets\valid\labels.json'
+json_path = r'media_datasets\valid\labels.json'
 with open(json_path, 'r') as f:
     data = json.load(f)
 
 # Step 2: Setup MediaPipe Object Detection
-model_path = r'media.tflite'  # Replace with your TFLite model path
+model_path = r'mediaNew.tflite'  # Replace with your TFLite model path
 base_options = python.BaseOptions(model_asset_path=model_path)
 options = vision.ObjectDetectorOptions(base_options=base_options, score_threshold=0.5)
 detector = vision.ObjectDetector.create_from_options(options)
 
 # Step 3: Directory containing test images
-image_directory = r'datasets\valid\images'
+image_directory = r'media_datasets\valid\images'
 
 # Prepare a mapping of actual classes
 categories = {cat["id"]: cat["name"] for cat in data.get("categories", [])}
@@ -30,12 +30,12 @@ results = []
 # Step 4: Loop through each image in the JSON data based on ID
 for image_info in sorted(data['images'], key=lambda x: x['id']):
     image_name = image_info['file_name']
-    image_id = image_info['id']  # Get the image ID
+    image_id = image_info['id'] + 1  # Adjust ID to start from 1
     image_path = os.path.join(image_directory, image_name)
     
     # Check if the image file exists
     if not os.path.exists(image_path):
-        print(f"Error: The file '{image_path}' does not exist.")
+        print(f"Skipping: '{image_path}' does not exist.")
         continue
 
     # Load the image
@@ -43,7 +43,7 @@ for image_info in sorted(data['images'], key=lambda x: x['id']):
 
     # Check if the image is loaded correctly
     if image is None:
-        print(f"Error: Could not open image file {image_path}.")
+        print(f"Skipping: Could not open image file {image_path}.")
         continue
 
     # Convert the image from BGR to RGB (MediaPipe uses RGB format)
@@ -55,6 +55,9 @@ for image_info in sorted(data['images'], key=lambda x: x['id']):
     # Step 5: Detect objects in the image
     detection_result = detector.detect(mp_image)
 
+    # Initialize a flag to track if detections were found
+    detections_found = False
+
     # Step 6: Store Detected Labels and Probabilities
     for detection in detection_result.detections:
         predicted_class_name = detection.categories[0].category_name  # Get the predicted class name
@@ -63,23 +66,35 @@ for image_info in sorted(data['images'], key=lambda x: x['id']):
         # Get the actual class name from annotations
         actual_class_name = "Unknown"
         for annotation in annotations:
-            if annotation["image_id"] == image_id:
+            if annotation["image_id"] == image_info["id"]:  # Match original ID before +1
                 actual_class_name = categories.get(annotation["category_id"], "Unknown")
                 break
 
         # Append the results to the list
         results.append({
-            "S.No": image_id + 1,  # Adjusting image_id to start from 1
+            "S.No": image_id,  # ID now starts from 1
             "Actual_class": actual_class_name,
             "Predicted_class": predicted_class_name,
             "Prob": probability
+        })
+
+        # Mark that detections were found
+        detections_found = True
+
+    # If no detections, append a background entry for this image
+    if not detections_found:
+        results.append({
+            "S.No": image_id,  # ID now starts from 1
+            "Actual_class": actual_class_name,
+            "Predicted_class": "background",
+            "Prob": 1.0
         })
 
 # Step 7: Create a DataFrame from the results
 df = pd.DataFrame(results)
 
 # Step 8: Save to Excel
-excel_file = "media_output_labels.xlsx"
+excel_file = "media_output_labelsNew.xlsx"
 df.to_excel(excel_file, index=False, sheet_name="Labels")
 
-print(f"Data successfully saved to {excel_file}")
+print(f"✅ Data successfully saved to {excel_file}")
