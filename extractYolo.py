@@ -5,16 +5,16 @@ import os
 from ultralytics import YOLO
 
 # Step 1: Load JSON data from a file
-json_path = r'media_datasets\valid\labels.json'
+json_path = r'datasets\valid\labels.json'
 with open(json_path, 'r') as f:
     data = json.load(f)
 
 # Step 2: Load the YOLO model
-model_path = "yoloNew.pt"  # Replace with your YOLO model path
+model_path = "yolo.pt"  # Replace with your YOLO model path
 model = YOLO(model_path)
 
 # Step 3: Directory containing test images
-image_directory = r'media_datasets\valid\images'
+image_directory = r'datasets\valid\images'
 
 # Prepare a mapping of actual classes
 categories = {cat["id"]: cat["name"] for cat in data.get("categories", [])}
@@ -84,7 +84,7 @@ for image_info in sorted(data['images'], key=lambda x: x['id']):
 df = pd.DataFrame(results)
 
 # Step 9: Save to Excel
-excel_file = "yolo_output_labelsNew1.xlsx"
+excel_file = "yolo_output_labels.xlsx"
 df.to_excel(excel_file, index=False, sheet_name="Labels")
 
 print(f"✅ Data successfully saved to {excel_file}")

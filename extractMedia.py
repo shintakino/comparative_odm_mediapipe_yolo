@@ -7,18 +7,18 @@ from mediapipe.tasks.python import vision
 import os
 
 # Step 1: Load JSON data from a file
-json_path = r'media_datasets\valid\labels.json'
+json_path = r'datasets\valid\labels.json'
 with open(json_path, 'r') as f:
     data = json.load(f)
 
 # Step 2: Setup MediaPipe Object Detection
-model_path = r'mediaNew.tflite'  # Replace with your TFLite model path
+model_path = r'media.tflite'  # Replace with your TFLite model path
 base_options = python.BaseOptions(model_asset_path=model_path)
 options = vision.ObjectDetectorOptions(base_options=base_options, score_threshold=0.5)
 detector = vision.ObjectDetector.create_from_options(options)
 
 # Step 3: Directory containing test images
-image_directory = r'media_datasets\valid\images'
+image_directory = r'datasets\valid\images'
 
 # Prepare a mapping of actual classes
 categories = {cat["id"]: cat["name"] for cat in data.get("categories", [])}
@@ -94,7 +94,7 @@ for image_info in sorted(data['images'], key=lambda x: x['id']):
 df = pd.DataFrame(results)
 
 # Step 8: Save to Excel
-excel_file = "media_output_labelsNew.xlsx"
+excel_file = "media_output_labels.xlsx"
 df.to_excel(excel_file, index=False, sheet_name="Labels")
 
 print(f"✅ Data successfully saved to {excel_file}")
